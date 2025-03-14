@@ -10,18 +10,18 @@ pub enum Instruction {
     Nop,
     Mov,
     Add,
+    Sub,
+    Mul,
     /*
     Slp,
     Slx,
-    Sub,
-    Mul,
     Not,
     Dgt,
     Dst
     */
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Arg {
     Number(u64),
     Register(String),

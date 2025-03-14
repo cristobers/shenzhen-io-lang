@@ -81,3 +81,25 @@ fn parse_instruction(line: &str) -> Result<(String, Vec<String>), String> {
     };
     Ok((instruction, arguments))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::parse_instruction;
+    use crate::Arg;
+
+    #[test]
+    fn parse_test() {
+        let res = parse_instruction("nop").unwrap();
+        let empty: Vec<String> = Vec::new();
+        let op = String::from("nop");
+        assert_eq!(res, (op, empty));
+    }
+
+    #[test]
+    fn multi_arg_parse_test() {
+        let res = parse_instruction("mov 3 x1").unwrap();
+        let args: Vec<String> = Vec::from([String::from("3"), String::from("x1")]);
+        let op = String::from("mov");
+        assert_eq!(res, (op, args));
+    }
+}
