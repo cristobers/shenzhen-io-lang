@@ -12,10 +12,10 @@ pub enum Instruction {
     Add,
     Sub,
     Mul,
+    Not,
     /*
     Slp,
     Slx,
-    Not,
     Dgt,
     Dst
     */

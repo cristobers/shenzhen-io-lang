@@ -29,11 +29,50 @@ pub fn exec(line: (Instruction, Vec<Arg>), registers: &mut HashMap<String, Regis
         }
         Instruction::Sub => {
             // sub R/I
-            todo!();
+            let first_arg = args[0].clone();
+            let acc = registers.get("acc").unwrap();
+            let mut value = acc.value;
+            match first_arg {
+                Arg::Register(first) => {
+                    let reg_value = registers.get(&first).unwrap();
+                    value -= reg_value.value;
+                    let _ = registers.insert("acc".to_owned(), Register { value: value });
+                }
+                Arg::Number(i) => {
+                    value -= i;
+                    let _ = registers.insert("acc".to_owned(), Register { value: value });
+                }
+                _ => (),
+            };
+        }
+        Instruction::Not => {
+            let acc = registers.get("acc").unwrap().value;
+            match acc {
+                0 => {
+                    let _ = registers.insert("acc".to_owned(), Register { value: 100 });
+                }
+                _ => {
+                    let _ = registers.insert("acc".to_owned(), Register { value: 0 });
+                }
+            }
         }
         Instruction::Mul => {
             // mul R/I
-            todo!();
+            let first_arg = args[0].clone();
+            let acc = registers.get("acc").unwrap();
+            let mut value = acc.value;
+            match first_arg {
+                Arg::Register(first) => {
+                    let reg_value = registers.get(&first).unwrap();
+                    value *= reg_value.value;
+                    let _ = registers.insert("acc".to_owned(), Register { value: value });
+                }
+                Arg::Number(i) => {
+                    value *= i;
+                    let _ = registers.insert("acc".to_owned(), Register { value: value });
+                }
+                _ => (),
+            };
         }
         Instruction::Mov => {
             // mov R/I R

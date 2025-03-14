@@ -32,5 +32,4 @@ fn main() {
         machine::exec(line, &mut registers);
         dbg!(&registers);
     }
-    // ok, now actually go through distilled_program and execute it
 }

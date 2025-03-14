@@ -33,6 +33,9 @@ pub fn abstacted(
         "nop" => Instruction::Nop,
         "add" => Instruction::Add,
         "mov" => Instruction::Mov,
+        "sub" => Instruction::Sub,
+        "mul" => Instruction::Mul,
+        "not" => Instruction::Not,
         _ => todo!(),
     };
 

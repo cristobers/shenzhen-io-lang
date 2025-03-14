@@ -1,5 +1,3 @@
-add 3
-nop
-# pingus
-mov 2 x1
-add x1
+not
+sub 50
+mul 2
