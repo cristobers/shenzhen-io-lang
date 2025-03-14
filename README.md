@@ -1,2 +1,2 @@
 # shenzhen-io-lang
-Rust implementation of the language from Shenzhen I/O.
+This is a work in progress rust implementation of the language from Shenzhen I/O.
