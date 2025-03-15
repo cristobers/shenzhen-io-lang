@@ -2,7 +2,7 @@
     Definitions of instructions for the machines.
 */
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Instruction {
     Empty,
     Comment,
@@ -13,6 +13,8 @@ pub enum Instruction {
     Sub,
     Mul,
     Not,
+    Jmp,
+    Teq,
     /*
     Slp,
     Slx,
@@ -21,7 +23,7 @@ pub enum Instruction {
     */
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub enum Arg {
     Number(u64),
     Register(String),

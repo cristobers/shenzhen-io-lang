@@ -12,20 +12,29 @@ pub fn abstacted(
     instruction: (String, Vec<String>),
 ) -> Option<(instruction::Instruction, Vec<Arg>)> {
     let (instr, args) = instruction;
-    let first_char = instr.chars().nth(0).unwrap();
 
     if instr.is_empty() {
         return Some((Instruction::Empty, Vec::new()));
     }
 
+    if instr.contains(":") {
+        let label = instr.replace(":", "");
+        let label_name = Arg::Label(label);
+        return Some((Instruction::Label, Vec::from([label_name])));
+    }
+
+    let first_char = instr.chars().nth(0).unwrap();
     match first_char {
         // '#' => return (Instruction::Comment, Vec::new()),
         '#' => return None,
+        /*
         ':' => {
             let label = instr.replace(":", "");
+            //dbg!(&label);
             let label_name = Arg::Label(label);
             return Some((Instruction::Label, Vec::from([label_name])));
         }
+        */
         _ => (),
     }
 
@@ -36,6 +45,8 @@ pub fn abstacted(
         "sub" => Instruction::Sub,
         "mul" => Instruction::Mul,
         "not" => Instruction::Not,
+        "jmp" => Instruction::Jmp,
+        "teq" => Instruction::Teq,
         _ => todo!(),
     };
 
@@ -44,7 +55,11 @@ pub fn abstacted(
         if let Ok(v) = el.parse::<u64>() {
             arguments.push(Arg::Number(v));
         } else {
-            arguments.push(Arg::Register(el));
+            if parsed_instruction == Instruction::Jmp {
+                arguments.push(Arg::Label(el));
+            } else {
+                arguments.push(Arg::Register(el));
+            }
         }
     }
 
