@@ -17,6 +17,7 @@ fn main() {
         ("acc".to_owned(), Register { value: 0 }),
         ("x1".to_owned(), Register { value: 0 }),
         ("x2".to_owned(), Register { value: 0 }),
+        ("x3".to_owned(), Register { value: 0 }),
     ]);
 
 

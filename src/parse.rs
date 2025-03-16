@@ -25,16 +25,7 @@ pub fn abstracted(
 
     let first_char = instr.chars().nth(0).unwrap();
     match first_char {
-        // '#' => return (Instruction::Comment, Vec::new()),
         '#' => return None,
-        /*
-        ':' => {
-            let label = instr.replace(":", "");
-            //dbg!(&label);
-            let label_name = Arg::Label(label);
-            return Some((Instruction::Label, Vec::from([label_name])));
-        }
-        */
         _ => (),
     }
 
@@ -71,23 +62,6 @@ pub fn abstracted(
                     arguments.push(Arg::Register(el));
                 }
             }
-            /*
-            if parsed_instruction == Instruction::Jmp {
-                dbg!(&el);
-                arguments.push(Arg::Label(el));
-            } else {
-                if el.len() == 1 {
-                    let character = el.chars().nth(0).unwrap();
-                    let _ = match character {
-                        '+' => should_branch_true = true,
-                        '-' => should_branch_false = true,
-                        _ => (),
-                    };
-                } else {
-                    arguments.push(Arg::Register(el));
-                }
-            }
-            */
         }
     }
     if should_branch_true {

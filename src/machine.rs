@@ -127,15 +127,15 @@ pub fn exec(
         Instruction::Teq => {
             let first_arg = args[0].clone();
             let second_arg = args[1].clone();
+            let mut new_branch_val: bool = false;
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
                     // Comparison between registers.
-                    let mut new_branch_val: bool = false;
                     let first_reg = registers.get(&first).unwrap();
                     let secnd_reg = registers.get(&second).unwrap();
                     let _ = match first_reg.value == secnd_reg.value {
                         true => {
-                            println!("Changing branch to TRUE");
+                            // println!("Changing branch to TRUE");
                             new_branch_val = true
                         }
                         _ => new_branch_val = false,
@@ -143,16 +143,8 @@ pub fn exec(
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
-                    // TODO: IMPLEMENT THIS FOR THE PROGARM TO WORK
                     // Comparison between a register and a number.
                     let first_reg = registers.get(&first).unwrap();
-                    /*
-                    let _ = match first_reg.value == i {
-                        true => println!("TRUE!!!"),
-                        _ => println!("FALSE!!!"),
-                    };
-                    */
-                    let mut new_branch_val: bool = false;
                     let _ = match first_reg.value == i {
                         true => new_branch_val = true,
                         _ => new_branch_val = false,
@@ -161,10 +153,19 @@ pub fn exec(
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
                     // Comparison a number and a register.
+                    let second_reg = registers.get(&second).unwrap();
+                    let _ = match second_reg.value == i {
+                        true => new_branch_val = true,
+                        _ => new_branch_val = false,
+                    };
                     return (pc + 1, unchanged_branch);
                 }
                 (Arg::Number(i), Arg::Number(j)) => {
                     // Comparison between a number and a number.
+                    let _ = match j == i {
+                        true => new_branch_val = true,
+                        _ => new_branch_val = false,
+                    };
                     return (pc + 1, unchanged_branch);
                 }
                 _ => return (pc + 1, unchanged_branch),
