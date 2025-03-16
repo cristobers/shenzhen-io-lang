@@ -28,4 +28,6 @@ pub enum Arg {
     Number(u64),
     Register(String),
     Label(String),
+    BranchTrue,
+    BranchFalse,
 }

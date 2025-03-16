@@ -10,11 +10,22 @@ pub fn exec(
     registers: &mut HashMap<String, Register>,
     labels: &HashMap<Arg, usize>,
     pc: usize,
-) -> usize {
+    branch: &bool,
+) -> (usize, bool) {
+    let unchanged_branch: bool = *branch;
     let (instr, args) = line;
+
+    if args.contains(&Arg::BranchTrue) && *branch == false {
+        println!("Ignoring instruction.");
+        return (pc + 1, unchanged_branch);
+    } else if args.contains(&Arg::BranchFalse) && *branch == true {
+        println!("Ignoring instruction.");
+        return (pc + 1, unchanged_branch);
+    }
+
     match instr {
         Instruction::Nop | Instruction::Label | Instruction::Empty => {
-            return pc + 1;
+            return (pc + 1, unchanged_branch);
         }
         Instruction::Add => {
             // add R/I
@@ -33,7 +44,7 @@ pub fn exec(
                 }
                 _ => (),
             };
-            return pc + 1;
+            return (pc + 1, unchanged_branch);
         }
         Instruction::Sub => {
             // sub R/I
@@ -52,7 +63,7 @@ pub fn exec(
                 }
                 _ => panic!("Incorrect argument given."),
             };
-            return pc + 1;
+            return (pc + 1, unchanged_branch);
         }
         Instruction::Not => {
             let acc = registers.get("acc").unwrap().value;
@@ -64,7 +75,7 @@ pub fn exec(
                     let _ = registers.insert("acc".to_owned(), Register { value: 0 });
                 }
             }
-            return pc + 1;
+            return (pc + 1, unchanged_branch);
         }
         Instruction::Mul => {
             // mul R/I
@@ -83,7 +94,8 @@ pub fn exec(
                 }
                 _ => (),
             };
-            return pc + 1;
+            return (pc + 1, unchanged_branch);
+            return (pc + 1, unchanged_branch);
         }
         Instruction::Mov => {
             // mov R/I R
@@ -110,7 +122,7 @@ pub fn exec(
                 }
                 _ => (),
             };
-            return pc + 1;
+            return (pc + 1, unchanged_branch);
         }
         Instruction::Teq => {
             let first_arg = args[0].clone();
@@ -118,40 +130,51 @@ pub fn exec(
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
                     // Comparison between registers.
+                    let mut new_branch_val: bool = false;
                     let first_reg = registers.get(&first).unwrap();
                     let secnd_reg = registers.get(&second).unwrap();
                     let _ = match first_reg.value == secnd_reg.value {
-                        true => println!("TRUE!!!"),
-                        _ => println!("FALSE!!!"),
+                        true => {
+                            println!("Changing branch to TRUE");
+                            new_branch_val = true
+                        }
+                        _ => new_branch_val = false,
                     };
-                    return pc;
+                    return (pc + 1, new_branch_val);
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
+                    // TODO: IMPLEMENT THIS FOR THE PROGARM TO WORK
                     // Comparison between a register and a number.
                     let first_reg = registers.get(&first).unwrap();
+                    /*
                     let _ = match first_reg.value == i {
                         true => println!("TRUE!!!"),
                         _ => println!("FALSE!!!"),
                     };
-                    return pc;
+                    */
+                    let mut new_branch_val: bool = false;
+                    let _ = match first_reg.value == i {
+                        true => new_branch_val = true,
+                        _ => new_branch_val = false,
+                    };
+                    return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
                     // Comparison a number and a register.
-                    return pc;
+                    return (pc + 1, unchanged_branch);
                 }
                 (Arg::Number(i), Arg::Number(j)) => {
                     // Comparison between a number and a number.
-                    return pc;
+                    return (pc + 1, unchanged_branch);
                 }
-                _ => return pc
+                _ => return (pc + 1, unchanged_branch),
             }
         }
         Instruction::Jmp => {
-            // TODO: find a label that shares a name with the location,
-            //       move the program counter to it.
             let location = args[0].clone();
+            println!("Trying to jump to: {:?}", &location);
             let position = labels.get(&location).unwrap();
-            return *position;
+            return (*position, unchanged_branch);
         }
         _ => todo!(),
     }

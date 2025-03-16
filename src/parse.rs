@@ -8,7 +8,7 @@ use crate::instruction::Instruction;
 
 /// Turn the tuple of (String, args) to Option<(instruction::Instruction, args)>
 /// Returns None if parsed instruction is something we dont want, (e.g. a comment.)
-pub fn abstacted(
+pub fn abstracted(
     instruction: (String, Vec<String>),
 ) -> Option<(instruction::Instruction, Vec<Arg>)> {
     let (instr, args) = instruction;
@@ -50,19 +50,51 @@ pub fn abstacted(
         _ => todo!(),
     };
 
+    let mut should_branch_true: bool = false;
+    let mut should_branch_false: bool = false;
     let mut arguments: Vec<Arg> = Vec::new();
     for el in args {
         if let Ok(v) = el.parse::<u64>() {
             arguments.push(Arg::Number(v));
         } else {
+            if el.len() == 1 {
+                let character = el.chars().nth(0).unwrap();
+                let _ = match character {
+                    '+' => should_branch_true = true,
+                    '-' => should_branch_false = true,
+                    _ => (),
+                };
+            } else {
+                if instr == "jmp" {
+                    arguments.push(Arg::Label(el));
+                } else {
+                    arguments.push(Arg::Register(el));
+                }
+            }
+            /*
             if parsed_instruction == Instruction::Jmp {
+                dbg!(&el);
                 arguments.push(Arg::Label(el));
             } else {
-                arguments.push(Arg::Register(el));
+                if el.len() == 1 {
+                    let character = el.chars().nth(0).unwrap();
+                    let _ = match character {
+                        '+' => should_branch_true = true,
+                        '-' => should_branch_false = true,
+                        _ => (),
+                    };
+                } else {
+                    arguments.push(Arg::Register(el));
+                }
             }
+            */
         }
     }
-
+    if should_branch_true {
+        arguments.push(Arg::BranchTrue);
+    } else if should_branch_false {
+        arguments.push(Arg::BranchFalse);
+    }
     Some((parsed_instruction, arguments))
 }
 
@@ -80,30 +112,49 @@ pub fn split_line(line: &str) -> (String, Vec<String>) {
 }
 
 /// Given an instruction line, turn it into a tuple of (instruction, [args])
-fn parse_instruction(line: &str) -> Result<(String, Vec<String>), String> {
+pub fn parse_instruction(line: &str) -> Result<(String, Vec<String>), String> {
     let mut split: VecDeque<String> = line
         .split_ascii_whitespace()
         .into_iter()
         .map(|x| x.to_owned())
         .collect();
-    let instruction: String = split[0].clone();
-    if split.len() > 3 {
-        return Err(String::from("Too many arguments given"));
+    // let instruction: String = split[0].clone();
+
+    let instruction: String;
+    if split[0] == "+" || split[0] == "-" {
+        instruction = split[1].clone();
+        // dbg!(&split);
+        let arguments = match split.len() {
+            1 => Vec::new(),
+            _ => {
+                let instr_arg = split.pop_front().unwrap();
+                let branch = split.pop_front().unwrap();
+                split.push_front(instr_arg);
+                Vec::from(split.clone())
+            }
+        };
+        // dbg!(&arguments);
+        Ok((instruction, arguments))
+    } else {
+        instruction = split[0].clone();
+        let arguments = match split.len() {
+            1 => Vec::new(),
+            _ => {
+                let _ = split.pop_front();
+                Vec::from(split.clone())
+            }
+        };
+        Ok((instruction, arguments))
     }
-    let arguments = match split.len() {
-        1 => Vec::new(),
-        _ => {
-            let _ = split.pop_front();
-            Vec::from(split.clone())
-        }
-    };
-    Ok((instruction, arguments))
 }
 
 #[cfg(test)]
 mod tests {
+    use super::abstracted;
     use super::parse_instruction;
+    use super::split_line;
     use crate::Arg;
+    use crate::instruction::Instruction;
 
     #[test]
     fn parse_test() {
