@@ -1,8 +1,6 @@
 use instruction::Arg;
 use std::collections::VecDeque;
 
-use crate::register;
-
 use crate::instruction;
 use crate::instruction::Instruction;
 
@@ -102,7 +100,7 @@ pub fn parse_instruction(line: &str) -> Result<(String, Vec<String>), String> {
             1 => Vec::new(),
             _ => {
                 let instr_arg = split.pop_front().unwrap();
-                let branch = split.pop_front().unwrap();
+                let _ = split.pop_front().unwrap();
                 split.push_front(instr_arg);
                 Vec::from(split.clone())
             }

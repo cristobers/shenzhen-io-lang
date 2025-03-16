@@ -1,8 +1,5 @@
 use crate::{instruction::Arg, instruction::Instruction, register::Register};
-use std::{
-    collections::HashMap,
-    mem::{self, Discriminant},
-};
+use std::collections::HashMap;
 
 /// Given a line, execute it.
 pub fn exec(
@@ -95,7 +92,6 @@ pub fn exec(
                 _ => (),
             };
             return (pc + 1, unchanged_branch);
-            return (pc + 1, unchanged_branch);
         }
         Instruction::Mov => {
             // mov R/I R
@@ -104,7 +100,7 @@ pub fn exec(
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
                     let first_reg = registers.get(&first).unwrap();
-                    let secnd_reg = registers.get(&second).unwrap();
+                    // let _ = registers.get(&second).unwrap();
                     let _ = registers.insert(
                         second,
                         Register {
@@ -113,7 +109,7 @@ pub fn exec(
                     );
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
-                    let reg = registers.insert(
+                    let _ = registers.insert(
                         second.clone(),
                         Register {
                             value: i.to_owned(),
@@ -127,7 +123,7 @@ pub fn exec(
         Instruction::Teq => {
             let first_arg = args[0].clone();
             let second_arg = args[1].clone();
-            let mut new_branch_val: bool = false;
+            let new_branch_val: bool;
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
                     // Comparison between registers.
@@ -158,7 +154,7 @@ pub fn exec(
                         true => new_branch_val = true,
                         _ => new_branch_val = false,
                     };
-                    return (pc + 1, unchanged_branch);
+                    return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Number(j)) => {
                     // Comparison between a number and a number.
@@ -166,7 +162,7 @@ pub fn exec(
                         true => new_branch_val = true,
                         _ => new_branch_val = false,
                     };
-                    return (pc + 1, unchanged_branch);
+                    return (pc + 1, new_branch_val);
                 }
                 _ => return (pc + 1, unchanged_branch),
             }
@@ -179,8 +175,4 @@ pub fn exec(
         }
         _ => todo!(),
     }
-}
-
-fn arg_check(registers: &HashMap<&str, Register>) -> bool {
-    return registers.keys().len() <= 2;
 }

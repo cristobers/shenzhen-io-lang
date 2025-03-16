@@ -1,8 +1,10 @@
+# Works out the nth Fibbonacci number.
+
 mov 1 x1
 mov 1 x2
 loop:
     add 1
-    teq acc 9 
+    teq acc 2 
     + jmp end
     mov acc x3
 

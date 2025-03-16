@@ -3,13 +3,11 @@ mod machine;
 mod parse;
 mod register;
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 use std::fs;
-use std::hash::Hash;
 
 use crate::instruction::Instruction;
 use instruction::Arg;
-use parse::split_line;
 use register::Register;
 
 fn main() {
@@ -32,7 +30,7 @@ fn main() {
                 let (ref instr, ref args) = v;
                 if args.len() > 0 {
                     // We are an instruction that takes in arguments.
-                    if let Arg::Label(bob) = &args[0] {
+                    if let Arg::Label(_) = &args[0] {
                         if let Instruction::Label = &instr {
                             labels.insert(args[0].to_owned(), i);
                         }
