@@ -1,2 +1,4 @@
 # shenzhen-io-lang
-This is a work in progress rust implementation of the language from Shenzhen I/O.
+
+This is a WIP interpreter for the pseudo-assembly language featured in the game
+Shenzhen I/O.
