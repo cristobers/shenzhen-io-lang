@@ -121,6 +121,7 @@ pub fn exec(
             return (pc + 1, unchanged_branch);
         }
         Instruction::Teq => {
+            // teq R/I R/I
             let first_arg = args[0].clone();
             let second_arg = args[1].clone();
             let new_branch_val: bool;
@@ -208,6 +209,7 @@ pub fn exec(
             }
         }
         Instruction::Tlt => {
+            // tlt R/I R/I
             let first_arg = args[0].clone();
             let second_arg = args[1].clone();
             let new_branch_val: bool;
@@ -248,9 +250,10 @@ pub fn exec(
             }
         }
         Instruction::Jmp => {
+            // jmp L
             let location = args[0].clone();
             println!("Trying to jump to: {:?}", &location);
-            match &location {
+            let _ = match &location {
                 Arg::Label(place) => {
                     let position = labels.get(&location).unwrap();
                     return (*position, unchanged_branch);
