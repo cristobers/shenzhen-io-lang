@@ -21,25 +21,23 @@ fn main() {
     let file = fs::read_to_string("program.asm").unwrap();
     let mut distilled_program: Vec<(Instruction, Vec<Arg>)> = Vec::new();
     let mut labels: HashMap<Arg, usize> = HashMap::new();
-    for (i, line) in file.lines().enumerate() {
+    for line in file.lines() {
         let first_pass = parse::split_line(&line);
         let parsed = parse::abstracted(first_pass);
         match parsed {
             Some(v) => {
                 let (ref instr, ref args) = v;
-                if args.len() > 0 {
-                    // We are an instruction that takes in arguments.
-                    if let Arg::Label(_) = &args[0] {
-                        if let Instruction::Label = &instr {
-                            labels.insert(args[0].to_owned(), i);
-                        }
-                    }
-                    distilled_program.push(v);
-                } else {
-                    distilled_program.push(v);
-                }
+                distilled_program.push(v);
             }
             None => (),
+        }
+    }
+
+    // we want the labels to be based off of the distilled program,
+    // instead of being based off of the initial parsing.
+    for (i, (instr, args)) in distilled_program.iter().enumerate() {
+        if let Instruction::Label = instr {
+            labels.insert(args[0].to_owned(), i);
         }
     }
 
