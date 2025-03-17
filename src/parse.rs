@@ -156,18 +156,36 @@ mod tests {
 
     #[test]
     fn abstracted_test() {
-        let mut abs = abstracted(parse_instruction("nop").unwrap()).unwrap();
-        assert_eq!(abs, (Instruction::Nop, vec![]));
-        abs = abstracted(parse_instruction("add 1").unwrap()).unwrap();
-        assert_eq!(abs, (Instruction::Add, vec![Arg::Number(1)]));
-        abs = abstracted(parse_instruction("jmp end").unwrap()).unwrap();
         assert_eq!(
-            abs,
+            abstracted(parse_instruction("nop").unwrap()).unwrap(),
+            (Instruction::Nop, vec![])
+        );
+
+        assert_eq!(
+            abstracted(parse_instruction("add 1").unwrap()).unwrap(),
+            (Instruction::Add, vec![Arg::Number(1)])
+        );
+
+        assert_eq!(
+            abstracted(parse_instruction("add x1").unwrap()).unwrap(),
+            (Instruction::Add, vec![Arg::Register(String::from("x1"))])
+        );
+
+        assert_eq!(
+            abstracted(parse_instruction("jmp end").unwrap()).unwrap(),
             (Instruction::Jmp, vec![Arg::Label(String::from("end"))])
         );
-        abs = abstracted(parse_instruction("mov acc x1").unwrap()).unwrap();
+
         assert_eq!(
-            abs,
+            abstracted(parse_instruction("teq acc 5").unwrap()).unwrap(),
+            (
+                Instruction::Teq,
+                vec![Arg::Register(String::from("acc")), Arg::Number(5)]
+            )
+        );
+
+        assert_eq!(
+            abstracted(parse_instruction("mov acc x1").unwrap()).unwrap(),
             (
                 Instruction::Mov,
                 vec![
