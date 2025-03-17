@@ -12,7 +12,8 @@ pub fn abstracted(
     let (instr, args) = instruction;
 
     if instr.is_empty() {
-        return Some((Instruction::Empty, Vec::new()));
+        //return Some((Instruction::Empty, Vec::new()));
+        return None;
     }
 
     if instr.contains(":") {
@@ -193,6 +194,11 @@ mod tests {
                     Arg::Register(String::from("x1"))
                 ]
             )
+        );
+
+        assert_eq!(
+            abstracted(parse_instruction("+ add 3").unwrap()).unwrap(),
+            (Instruction::Add, vec![Arg::Number(3), Arg::BranchTrue,])
         );
     }
 }
