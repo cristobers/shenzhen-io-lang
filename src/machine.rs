@@ -129,41 +129,39 @@ pub fn exec(
                     // Comparison between registers.
                     let first_reg = registers.get(&first).unwrap();
                     let secnd_reg = registers.get(&second).unwrap();
-                    let _ = match first_reg.value == secnd_reg.value {
-                        true => {
-                            new_branch_val = true
-                        }
-                        _ => new_branch_val = false,
+                    let new_branch_val = match first_reg.value == secnd_reg.value {
+                        true =>  true,
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
                     // Comparison between a register and a number.
                     let first_reg = registers.get(&first).unwrap();
-                    let _ = match first_reg.value == i {
-                        true => new_branch_val = true,
-                        _ => new_branch_val = false,
+                    let new_branch_val = match first_reg.value == i {
+                        true => true,
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
                     // Comparison a number and a register.
                     let second_reg = registers.get(&second).unwrap();
-                    let _ = match second_reg.value == i {
-                        true => new_branch_val = true,
-                        _ => new_branch_val = false,
+                    let new_branch_val = match second_reg.value == i {
+                        true => true,
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Number(j)) => {
                     // Comparison between a number and a number.
-                    let _ = match j == i {
-                        true => new_branch_val = true,
-                        _ => new_branch_val = false,
+                    let new_branch_val = match j == i {
+                        true => true,
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
-                _ => panic!("Failed to parse arguments to teq."), 
+                _ => panic!("Failed to parse arguments to teq."),
             }
         }
         Instruction::Tgt => {
@@ -179,14 +177,14 @@ pub fn exec(
                     let secnd_reg = registers.get(&second).unwrap();
                     new_branch_val = match first_reg.value == secnd_reg.value {
                         true => true,
-                        _    => false
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Number(j)) => {
                     new_branch_val = match i > j {
                         true => true,
-                        _    => false
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
@@ -194,7 +192,7 @@ pub fn exec(
                     let first_reg = registers.get(&first).unwrap();
                     new_branch_val = match first_reg.value > i {
                         true => true,
-                        _    => false
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
@@ -202,7 +200,7 @@ pub fn exec(
                     let secnd_reg = registers.get(&second).unwrap();
                     new_branch_val = match i > secnd_reg.value {
                         true => true,
-                        _    => false
+                        _ => false,
                     };
                     return (pc + 1, new_branch_val);
                 }
