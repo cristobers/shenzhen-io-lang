@@ -144,4 +144,36 @@ mod tests {
         let op = String::from("mov");
         assert_eq!(res, (op, args));
     }
+
+    #[test]
+    fn branch_arg_parse_test() {
+        let res = parse_instruction("+ jmp end").unwrap();
+        let args: Vec<String> = Vec::from([String::from("+"), String::from("end")]);
+        let op = String::from("jmp");
+        assert_eq!(res, (op, args));
+    }
+
+    #[test]
+    fn abstracted_test() {
+        let mut abs = abstracted(parse_instruction("nop").unwrap()).unwrap();
+        assert_eq!(abs, (Instruction::Nop, vec![]));
+        abs = abstracted(parse_instruction("add 1").unwrap()).unwrap();
+        assert_eq!(abs, (Instruction::Add, vec![Arg::Number(1)]));
+        abs = abstracted(parse_instruction("jmp end").unwrap()).unwrap();
+        assert_eq!(
+            abs,
+            (Instruction::Jmp, vec![Arg::Label(String::from("end"))])
+        );
+        abs = abstracted(parse_instruction("mov acc x1").unwrap()).unwrap();
+        assert_eq!(
+            abs,
+            (
+                Instruction::Mov,
+                vec![
+                    Arg::Register(String::from("acc")),
+                    Arg::Register(String::from("x1"))
+                ]
+            )
+        );
+    }
 }
