@@ -131,7 +131,6 @@ pub fn exec(
                     let secnd_reg = registers.get(&second).unwrap();
                     let _ = match first_reg.value == secnd_reg.value {
                         true => {
-                            // println!("Changing branch to TRUE");
                             new_branch_val = true
                         }
                         _ => new_branch_val = false,
@@ -164,7 +163,50 @@ pub fn exec(
                     };
                     return (pc + 1, new_branch_val);
                 }
-                _ => return (pc + 1, unchanged_branch),
+                _ => panic!("Failed to parse arguments to teq."), 
+            }
+        }
+        Instruction::Tgt => {
+            // tgt R/I R/I
+            // Test to see if the value of the first operand is greater than the value
+            // of the second operand.
+            let first_arg = args[0].clone();
+            let second_arg = args[1].clone();
+            let new_branch_val: bool;
+            match (first_arg, second_arg) {
+                (Arg::Register(first), Arg::Register(second)) => {
+                    let first_reg = registers.get(&first).unwrap();
+                    let secnd_reg = registers.get(&second).unwrap();
+                    new_branch_val = match first_reg.value == secnd_reg.value {
+                        true => true,
+                        _    => false
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                (Arg::Number(i), Arg::Number(j)) => {
+                    new_branch_val = match i > j {
+                        true => true,
+                        _    => false
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                (Arg::Register(first), Arg::Number(i)) => {
+                    let first_reg = registers.get(&first).unwrap();
+                    new_branch_val = match first_reg.value > i {
+                        true => true,
+                        _    => false
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                (Arg::Number(i), Arg::Register(second)) => {
+                    let secnd_reg = registers.get(&second).unwrap();
+                    new_branch_val = match i > secnd_reg.value {
+                        true => true,
+                        _    => false
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                _ => panic!("Failed to parse the arguments to tgt."),
             }
         }
         Instruction::Jmp => {
