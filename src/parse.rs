@@ -36,6 +36,7 @@ pub fn abstracted(
         "not" => Instruction::Not,
         "jmp" => Instruction::Jmp,
         "teq" => Instruction::Teq,
+        "tgt" => Instruction::Tgt,
         _ => todo!(),
     };
 

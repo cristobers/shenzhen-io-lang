@@ -15,6 +15,7 @@ pub enum Instruction {
     Not,
     Jmp,
     Teq,
+    Tgt,
     /*
     Slp,
     Slx,
