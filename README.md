@@ -14,3 +14,4 @@ Shenzhen I/O.
 | jmp         |
 | teq         |
 | tgt         |
+| tlt         |
