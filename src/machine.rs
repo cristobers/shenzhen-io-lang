@@ -130,7 +130,7 @@ pub fn exec(
                     let first_reg = registers.get(&first).unwrap();
                     let secnd_reg = registers.get(&second).unwrap();
                     let new_branch_val = match first_reg.value == secnd_reg.value {
-                        true =>  true,
+                        true => true,
                         _ => false,
                     };
                     return (pc + 1, new_branch_val);
@@ -175,7 +175,7 @@ pub fn exec(
                 (Arg::Register(first), Arg::Register(second)) => {
                     let first_reg = registers.get(&first).unwrap();
                     let secnd_reg = registers.get(&second).unwrap();
-                    new_branch_val = match first_reg.value == secnd_reg.value {
+                    new_branch_val = match first_reg.value > secnd_reg.value {
                         true => true,
                         _ => false,
                     };
@@ -207,11 +207,56 @@ pub fn exec(
                 _ => panic!("Failed to parse the arguments to tgt."),
             }
         }
+        Instruction::Tlt => {
+            let first_arg = args[0].clone();
+            let second_arg = args[1].clone();
+            let new_branch_val: bool;
+            match (first_arg, second_arg) {
+                (Arg::Register(first), Arg::Register(second)) => {
+                    let first_reg = registers.get(&first).unwrap();
+                    let secnd_reg = registers.get(&second).unwrap();
+                    new_branch_val = match first_reg.value < secnd_reg.value {
+                        true => true,
+                        _ => false,
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                (Arg::Number(i), Arg::Number(j)) => {
+                    new_branch_val = match i < j {
+                        true => true,
+                        _ => false,
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                (Arg::Register(first), Arg::Number(i)) => {
+                    let first_reg = registers.get(&first).unwrap();
+                    new_branch_val = match first_reg.value < i {
+                        true => true,
+                        _ => false,
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                (Arg::Number(i), Arg::Register(second)) => {
+                    let secnd_reg = registers.get(&second).unwrap();
+                    new_branch_val = match i < secnd_reg.value {
+                        true => true,
+                        _ => false,
+                    };
+                    return (pc + 1, new_branch_val);
+                }
+                _ => panic!("Failed to parse the arguments to tgt."),
+            }
+        }
         Instruction::Jmp => {
             let location = args[0].clone();
             println!("Trying to jump to: {:?}", &location);
-            let position = labels.get(&location).unwrap();
-            return (*position, unchanged_branch);
+            match &location {
+                Arg::Label(place) => {
+                    let position = labels.get(&location).unwrap();
+                    return (*position, unchanged_branch);
+                }
+                _ => panic!("Argument provided to jmp was not a label."),
+            };
         }
         _ => todo!(),
     }

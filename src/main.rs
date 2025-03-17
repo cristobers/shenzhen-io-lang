@@ -18,7 +18,6 @@ fn main() {
         ("x3".to_owned(), Register { value: 0 }),
     ]);
 
-
     let file = fs::read_to_string("program.asm").unwrap();
     let mut distilled_program: Vec<(Instruction, Vec<Arg>)> = Vec::new();
     let mut labels: HashMap<Arg, usize> = HashMap::new();
