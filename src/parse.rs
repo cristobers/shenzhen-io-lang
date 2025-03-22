@@ -93,8 +93,6 @@ pub fn parse_instruction(line: &str) -> Result<(String, Vec<String>), String> {
         .into_iter()
         .map(|x| x.to_owned())
         .collect();
-    // let instruction: String = split[0].clone();
-
     let instruction: String;
     if split[0] == "+" || split[0] == "-" {
         instruction = split[1].clone();

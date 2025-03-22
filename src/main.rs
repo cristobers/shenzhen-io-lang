@@ -26,7 +26,7 @@ fn main() {
         let parsed = parse::abstracted(first_pass);
         match parsed {
             Some(v) => {
-                let (ref instr, ref args) = v;
+                // let (ref instr, ref args) = v;
                 distilled_program.push(v);
             }
             None => (),
@@ -46,13 +46,12 @@ fn main() {
     let mut branch: bool = false;
     while program_counter < distilled_program.len() {
         let line = &distilled_program[program_counter];
-        println!("{:?}", line);
         let (pc, curr_branch) =
             machine::exec(line, &mut registers, &labels, program_counter, &branch);
         program_counter = pc;
         branch = curr_branch;
         count += 1;
-        println!("{:?}", &registers);
     }
+    println!("Final register state: {:?}", registers);
     println!("Finished execution in {} steps.", &count);
 }

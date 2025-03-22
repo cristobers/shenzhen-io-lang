@@ -4,8 +4,6 @@
 
 #[derive(Debug, PartialEq)]
 pub enum Instruction {
-    Empty,
-    Comment,
     Label,
     Nop,
     Mov,
@@ -18,6 +16,8 @@ pub enum Instruction {
     Tgt,
     Tlt,
     /*
+    Empty,
+    Comment,
     Slp,
     Slx,
     Dgt,

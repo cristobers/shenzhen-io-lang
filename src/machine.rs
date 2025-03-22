@@ -13,15 +13,15 @@ pub fn exec(
     let (instr, args) = line;
 
     if args.contains(&Arg::BranchTrue) && *branch == false {
-        println!("Ignoring instruction.");
+        // println!("Ignoring instruction.");
         return (pc + 1, unchanged_branch);
     } else if args.contains(&Arg::BranchFalse) && *branch == true {
-        println!("Ignoring instruction.");
+        // println!("Ignoring instruction.");
         return (pc + 1, unchanged_branch);
     }
 
     match instr {
-        Instruction::Nop | Instruction::Label | Instruction::Empty => {
+        Instruction::Nop | Instruction::Label => {
             return (pc + 1, unchanged_branch);
         }
         Instruction::Add => {
@@ -31,7 +31,13 @@ pub fn exec(
             let mut value = acc.value;
             match first_arg {
                 Arg::Register(first) => {
-                    let reg_value = registers.get(&first).unwrap();
+                    let reg_value = match registers.get(&first) {
+                        Some(v) => v,
+                        None => {
+                            println!("Failed to get register with name: {:?}", first);
+                            panic!();
+                        }
+                    };
                     value += reg_value.value;
                     let _ = registers.insert("acc".to_owned(), Register { value: value });
                 }
@@ -130,7 +136,7 @@ pub fn exec(
                     // Comparison between registers.
                     let first_reg = registers.get(&first).unwrap();
                     let secnd_reg = registers.get(&second).unwrap();
-                    let new_branch_val = match first_reg.value == secnd_reg.value {
+                    new_branch_val = match first_reg.value == secnd_reg.value {
                         true => true,
                         _ => false,
                     };
@@ -139,7 +145,7 @@ pub fn exec(
                 (Arg::Register(first), Arg::Number(i)) => {
                     // Comparison between a register and a number.
                     let first_reg = registers.get(&first).unwrap();
-                    let new_branch_val = match first_reg.value == i {
+                    new_branch_val = match first_reg.value == i {
                         true => true,
                         _ => false,
                     };
@@ -148,7 +154,7 @@ pub fn exec(
                 (Arg::Number(i), Arg::Register(second)) => {
                     // Comparison a number and a register.
                     let second_reg = registers.get(&second).unwrap();
-                    let new_branch_val = match second_reg.value == i {
+                    new_branch_val = match second_reg.value == i {
                         true => true,
                         _ => false,
                     };
@@ -156,7 +162,7 @@ pub fn exec(
                 }
                 (Arg::Number(i), Arg::Number(j)) => {
                     // Comparison between a number and a number.
-                    let new_branch_val = match j == i {
+                    new_branch_val = match j == i {
                         true => true,
                         _ => false,
                     };
@@ -231,7 +237,10 @@ pub fn exec(
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
-                    let first_reg = registers.get(&first).unwrap();
+                    let first_reg = match registers.get(&first) {
+                        Some(v) => v,
+                        None => panic!("In command tlt: Failed to find a register called \"{}\"", &first)
+                    };
                     new_branch_val = match first_reg.value < i {
                         true => true,
                         _ => false,
@@ -246,15 +255,15 @@ pub fn exec(
                     };
                     return (pc + 1, new_branch_val);
                 }
-                _ => panic!("Failed to parse the arguments to tgt."),
+                u => panic!("Unknown arguments given to tlt. {:?}", u),
             }
         }
         Instruction::Jmp => {
             // jmp L
             let location = args[0].clone();
-            println!("Trying to jump to: {:?}", &location);
+            // println!("Trying to jump to: {:?}", &location);
             let _ = match &location {
-                Arg::Label(place) => {
+                Arg::Label(_) => {
                     let position = labels.get(&location).unwrap();
                     return (*position, unchanged_branch);
                 }
