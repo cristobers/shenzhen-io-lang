@@ -5,6 +5,7 @@ use crate::instruction;
 use crate::instruction::Instruction;
 
 /// Turn the tuple of (String, args) to Option<(instruction::Instruction, args)>
+/// 
 /// Returns None if parsed instruction is something we dont want, (e.g. a comment.)
 pub fn abstracted(
     instruction: (String, Vec<String>),
@@ -12,7 +13,6 @@ pub fn abstracted(
     let (instr, args) = instruction;
 
     if instr.is_empty() {
-        //return Some((Instruction::Empty, Vec::new()));
         return None;
     }
 
@@ -106,7 +106,6 @@ pub fn parse_instruction(line: &str) -> Result<(String, Vec<String>), String> {
                 Vec::from(split.clone())
             }
         };
-        // dbg!(&arguments);
         Ok((instruction, arguments))
     } else {
         instruction = split[0].clone();

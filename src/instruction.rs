@@ -2,6 +2,7 @@
     Definitions of instructions for the machines.
 */
 
+/// Instructions for the Shenzhen I/O assembly language.
 #[derive(Debug, PartialEq)]
 pub enum Instruction {
     Label,
@@ -25,6 +26,7 @@ pub enum Instruction {
     */
 }
 
+/// Types that an argument to an instruction can be.
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub enum Arg {
     Number(u64),

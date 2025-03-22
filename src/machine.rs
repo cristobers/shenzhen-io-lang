@@ -1,7 +1,7 @@
 use crate::{instruction::Arg, instruction::Instruction, register::Register};
 use std::collections::HashMap;
 
-/// Given a line, execute it.
+/// Given a line, execute it, alter registers if need be, update the program counter.
 pub fn exec(
     line: &(Instruction, Vec<Arg>),
     registers: &mut HashMap<String, Register>,
@@ -13,10 +13,8 @@ pub fn exec(
     let (instr, args) = line;
 
     if args.contains(&Arg::BranchTrue) && *branch == false {
-        // println!("Ignoring instruction.");
         return (pc + 1, unchanged_branch);
     } else if args.contains(&Arg::BranchFalse) && *branch == true {
-        // println!("Ignoring instruction.");
         return (pc + 1, unchanged_branch);
     }
 
@@ -134,7 +132,13 @@ pub fn exec(
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
                     // Comparison between registers.
-                    let first_reg = registers.get(&first).unwrap();
+                    let first_reg = match registers.get(&first) {
+                        Some(v) => v,
+                        None => {
+                            println!("Failed to find register {} in teq.", first);
+                            panic!();
+                        }
+                    };
                     let secnd_reg = registers.get(&second).unwrap();
                     new_branch_val = match first_reg.value == secnd_reg.value {
                         true => true,
@@ -144,7 +148,13 @@ pub fn exec(
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
                     // Comparison between a register and a number.
-                    let first_reg = registers.get(&first).unwrap();
+                    let first_reg = match registers.get(&first) {
+                        Some(v) => v,
+                        None => {
+                            println!("Failed to find register {} in teq.", first);
+                            panic!();
+                        }
+                    };
                     new_branch_val = match first_reg.value == i {
                         true => true,
                         _ => false,
@@ -221,7 +231,13 @@ pub fn exec(
             let new_branch_val: bool;
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
-                    let first_reg = registers.get(&first).unwrap();
+                    let first_reg = match registers.get(&first) {
+                        Some(v) => v,
+                        None => {
+                            println!("Couldn't find the first register {} in tlt", first);
+                            panic!();
+                        }
+                    };
                     let secnd_reg = registers.get(&second).unwrap();
                     new_branch_val = match first_reg.value < secnd_reg.value {
                         true => true,
@@ -239,7 +255,10 @@ pub fn exec(
                 (Arg::Register(first), Arg::Number(i)) => {
                     let first_reg = match registers.get(&first) {
                         Some(v) => v,
-                        None => panic!("In command tlt: Failed to find a register called \"{}\"", &first)
+                        None => panic!(
+                            "In command tlt: Failed to find a register called \"{}\"",
+                            &first
+                        ),
                     };
                     new_branch_val = match first_reg.value < i {
                         true => true,
@@ -248,7 +267,13 @@ pub fn exec(
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
-                    let secnd_reg = registers.get(&second).unwrap();
+                    let secnd_reg = match registers.get(&second) {
+                        Some(v) => v,
+                        None => {
+                            println!("Failed to find register {} in tlt.", second);
+                            panic!();
+                        }
+                    };
                     new_branch_val = match i < secnd_reg.value {
                         true => true,
                         _ => false,
@@ -261,7 +286,6 @@ pub fn exec(
         Instruction::Jmp => {
             // jmp L
             let location = args[0].clone();
-            // println!("Trying to jump to: {:?}", &location);
             let _ = match &location {
                 Arg::Label(_) => {
                     let position = labels.get(&location).unwrap();
