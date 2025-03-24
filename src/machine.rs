@@ -103,7 +103,7 @@ pub fn exec(
             let second_arg = args[1].clone();
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
-                    let first_reg = registers.get(&first).unwrap();
+                    let first_reg = get_register_value(first, registers);
                     // let _ = registers.get(&second).unwrap();
                     let _ = registers.insert(
                         second,
@@ -113,6 +113,8 @@ pub fn exec(
                     );
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
+                    // check that the register exists.
+                    let _ = get_register_value(second.to_owned(), registers);
                     let _ = registers.insert(
                         second.clone(),
                         Register {
@@ -132,14 +134,8 @@ pub fn exec(
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
                     // Comparison between registers.
-                    let first_reg = match registers.get(&first) {
-                        Some(v) => v,
-                        None => {
-                            println!("Failed to find register {} in teq.", first);
-                            panic!();
-                        }
-                    };
-                    let secnd_reg = registers.get(&second).unwrap();
+                    let first_reg = get_register_value(first, registers);
+                    let secnd_reg = get_register_value(second, registers);
                     new_branch_val = match first_reg.value == secnd_reg.value {
                         true => true,
                         _ => false,
@@ -148,13 +144,7 @@ pub fn exec(
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
                     // Comparison between a register and a number.
-                    let first_reg = match registers.get(&first) {
-                        Some(v) => v,
-                        None => {
-                            println!("Failed to find register {} in teq.", first);
-                            panic!();
-                        }
-                    };
+                    let first_reg = get_register_value(first, registers);
                     new_branch_val = match first_reg.value == i {
                         true => true,
                         _ => false,
@@ -163,8 +153,8 @@ pub fn exec(
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
                     // Comparison a number and a register.
-                    let second_reg = registers.get(&second).unwrap();
-                    new_branch_val = match second_reg.value == i {
+                    let secnd_reg = get_register_value(second, registers);
+                    new_branch_val = match secnd_reg.value == i {
                         true => true,
                         _ => false,
                     };
@@ -190,8 +180,8 @@ pub fn exec(
             let new_branch_val: bool;
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
-                    let first_reg = registers.get(&first).unwrap();
-                    let secnd_reg = registers.get(&second).unwrap();
+                    let first_reg = get_register_value(first, registers);
+                    let secnd_reg = get_register_value(second, registers);
                     new_branch_val = match first_reg.value > secnd_reg.value {
                         true => true,
                         _ => false,
@@ -206,7 +196,7 @@ pub fn exec(
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
-                    let first_reg = registers.get(&first).unwrap();
+                    let first_reg = get_register_value(first, registers);
                     new_branch_val = match first_reg.value > i {
                         true => true,
                         _ => false,
@@ -214,7 +204,7 @@ pub fn exec(
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
-                    let secnd_reg = registers.get(&second).unwrap();
+                    let secnd_reg = get_register_value(second, registers);
                     new_branch_val = match i > secnd_reg.value {
                         true => true,
                         _ => false,
@@ -231,14 +221,8 @@ pub fn exec(
             let new_branch_val: bool;
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
-                    let first_reg = match registers.get(&first) {
-                        Some(v) => v,
-                        None => {
-                            println!("Couldn't find the first register {} in tlt", first);
-                            panic!();
-                        }
-                    };
-                    let secnd_reg = registers.get(&second).unwrap();
+                    let first_reg = get_register_value(first, registers);
+                    let secnd_reg = get_register_value(second, registers);
                     new_branch_val = match first_reg.value < secnd_reg.value {
                         true => true,
                         _ => false,
@@ -253,13 +237,7 @@ pub fn exec(
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Register(first), Arg::Number(i)) => {
-                    let first_reg = match registers.get(&first) {
-                        Some(v) => v,
-                        None => panic!(
-                            "In command tlt: Failed to find a register called \"{}\"",
-                            &first
-                        ),
-                    };
+                    let first_reg = get_register_value(first, registers);
                     new_branch_val = match first_reg.value < i {
                         true => true,
                         _ => false,
@@ -267,13 +245,7 @@ pub fn exec(
                     return (pc + 1, new_branch_val);
                 }
                 (Arg::Number(i), Arg::Register(second)) => {
-                    let secnd_reg = match registers.get(&second) {
-                        Some(v) => v,
-                        None => {
-                            println!("Failed to find register {} in tlt.", second);
-                            panic!();
-                        }
-                    };
+                    let secnd_reg = get_register_value(second, registers);
                     new_branch_val = match i < secnd_reg.value {
                         true => true,
                         _ => false,
@@ -294,6 +266,15 @@ pub fn exec(
                 _ => panic!("Argument provided to jmp was not a label."),
             };
         }
-        _ => todo!(),
+    }
+}
+
+fn get_register_value(arg: String, registers: &HashMap<String, Register>) -> &Register {
+    match registers.get(&arg) {
+        Some(v) => v,
+        None => {
+            println!("Failed to find a register called {:?}", arg);
+            panic!();
+        }
     }
 }
