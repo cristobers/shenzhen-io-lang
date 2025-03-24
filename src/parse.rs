@@ -79,7 +79,13 @@ pub fn split_line(line: &str) -> (String, Vec<String>) {
     if let Some(_) = first_char {
         match line.chars().nth(0).unwrap() {
             '#' | ':' => (line.to_owned(), Vec::new()),
-            _ => parse_instruction(line).unwrap(),
+            _ => {
+                if let Ok(v) = parse_instruction(line) {
+                    return v;
+                } else {
+                    (String::new(), Vec::new())
+                }
+            }
         }
     } else {
         (String::new(), Vec::new())
@@ -94,6 +100,9 @@ pub fn parse_instruction(line: &str) -> Result<(String, Vec<String>), String> {
         .map(|x| x.to_owned())
         .collect();
     let instruction: String;
+    if split.len() == 0 {
+        return Err(String::from("Empty string"));
+    }
     if split[0] == "+" || split[0] == "-" {
         instruction = split[1].clone();
         // dbg!(&split);

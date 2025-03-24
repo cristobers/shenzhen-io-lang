@@ -1,15 +1,23 @@
 mov 1 x1
+mov 1 x2
 loop:
     add 1
-    teq acc 10
+    # 0 - 9 gives us 10 fibbonacci numbers.
+    teq acc 9
+    - jmp fibb
     + jmp end
-    jmp double
-double:
+fibb:
+    # save our acc state to x3
+    mov acc x3
+
+    mov 0 acc
+    add x1
+    add x2
+    mov x2 x1
     mov acc x2
-    mov x1 acc
-    mul 2
-    mov acc x1
-    mov x2 acc
+    
+    # reset acc
+    mov x3 acc
     jmp loop
 end:
     nop
