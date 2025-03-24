@@ -5,12 +5,25 @@ mod register;
 
 use std::collections::HashMap;
 use std::fs;
+use std::env;
 
 use crate::instruction::Instruction;
 use instruction::Arg;
 use register::Register;
 
 fn main() {
+
+    // ./exe <registers> "path-to-file"
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 3 {
+        panic!("Useage: ./exe <registers> \"path_to_file\"");
+    }
+
+    let mut file = String::new();
+    if let Some(_) = args.iter().nth(2) {
+        file = fs::read_to_string("program.asm").unwrap();
+    }
+
     let mut registers: HashMap<String, Register> = HashMap::from([
         ("acc".to_owned(), Register { value: 0 }),
         ("x1".to_owned(), Register { value: 0 }),
@@ -18,7 +31,8 @@ fn main() {
         ("x3".to_owned(), Register { value: 0 }),
     ]);
 
-    let file = fs::read_to_string("program.asm").unwrap();
+    //let file = fs::read_to_string("program.asm").unwrap();
+
     let mut distilled_program: Vec<(Instruction, Vec<Arg>)> = Vec::new();
     let mut labels: HashMap<Arg, usize> = HashMap::new();
     for line in file.lines() {
@@ -50,6 +64,7 @@ fn main() {
             machine::exec(line, &mut registers, &labels, program_counter, &branch);
         program_counter = pc;
         branch = curr_branch;
+        println!("{:?}", &registers);
         count += 1;
     }
     println!("Final register state: {:?}", registers);

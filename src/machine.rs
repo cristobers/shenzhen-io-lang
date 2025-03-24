@@ -29,13 +29,7 @@ pub fn exec(
             let mut value = acc.value;
             match first_arg {
                 Arg::Register(first) => {
-                    let reg_value = match registers.get(&first) {
-                        Some(v) => v,
-                        None => {
-                            println!("Failed to get register with name: {:?}", first);
-                            panic!();
-                        }
-                    };
+                    let reg_value = get_register_value(first, registers);
                     value += reg_value.value;
                     let _ = registers.insert("acc".to_owned(), Register { value: value });
                 }
@@ -54,7 +48,8 @@ pub fn exec(
             let mut value = acc.value;
             match first_arg {
                 Arg::Register(first) => {
-                    let reg_value = registers.get(&first).unwrap();
+                    let reg_value = get_register_value(first, registers);
+                    //let reg_value = registers.get(&first).unwrap();
                     value -= reg_value.value;
                     let _ = registers.insert("acc".to_owned(), Register { value: value });
                 }
@@ -85,7 +80,7 @@ pub fn exec(
             let mut value = acc.value;
             match first_arg {
                 Arg::Register(first) => {
-                    let reg_value = registers.get(&first).unwrap();
+                    let reg_value = get_register_value(first, registers);
                     value *= reg_value.value;
                     let _ = registers.insert("acc".to_owned(), Register { value: value });
                 }
@@ -104,7 +99,6 @@ pub fn exec(
             match (first_arg, second_arg) {
                 (Arg::Register(first), Arg::Register(second)) => {
                     let first_reg = get_register_value(first, registers);
-                    // let _ = registers.get(&second).unwrap();
                     let _ = registers.insert(
                         second,
                         Register {
